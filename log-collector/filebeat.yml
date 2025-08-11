@@ -1,0 +1,12 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - ''
+
+output.kafka:
+  hosts: ["kafka:9092"]
+  topic: siem-logs
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
