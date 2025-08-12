@@ -41,5 +41,16 @@ services:
     depends_on:
       - elasticsearch
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./log-collector/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /opt/threat-detection-lab/logs/suricata/ssh:/logs:ro
+    command: ["--strict.perms=false"]
+    depends_on:
+      - kafka
+
 volumes:
   esdata:

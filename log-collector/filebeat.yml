@@ -2,7 +2,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - ''
+      - '/logs/eve.json'
 
 output.kafka:
   hosts: ["kafka:9092"]
