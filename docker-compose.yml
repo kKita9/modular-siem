@@ -56,5 +56,15 @@ services:
     depends_on:
       - kafka
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.0
+    container_name: logstash
+    volumes:
+      - ./log-parser/pipeline:/usr/share/logstash/pipeline:ro
+    depends_on:
+      - kafka
+      - elasticsearch
+
+
 volumes:
   esdata:
