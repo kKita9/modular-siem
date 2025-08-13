@@ -65,5 +65,13 @@ services:
       - message-broker
       - data-storage
 
+  data-normalizer:
+    build:
+      context: ./data-normalizer
+    container_name: data-normalizer 
+    depends_on:
+      - message-broker
+    restart: always
+
 volumes:
   esdata:
