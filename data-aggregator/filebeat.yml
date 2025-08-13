@@ -6,7 +6,7 @@ filebeat.inputs:
 
 output.kafka:
   hosts: ["kafka:9092"]
-  topic: siem-logs
+  topic: raw-logs
   required_acks: 1
   compression: gzip
   max_message_bytes: 1000000
