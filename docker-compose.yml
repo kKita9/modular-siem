@@ -50,7 +50,7 @@ services:
     container_name: filebeat
     user: root
     volumes:
-      - ./log-collector/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./data-aggregator/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /opt/threat-detection-lab/logs/suricata/ssh:/logs:ro
     command: ["--strict.perms=false"]
     depends_on:
@@ -60,7 +60,7 @@ services:
     image: docker.elastic.co/logstash/logstash:8.13.0
     container_name: logstash
     volumes:
-      - ./log-parser/pipeline:/usr/share/logstash/pipeline:ro
+      - ./data-aggregator/pipeline:/usr/share/logstash/pipeline:ro
     depends_on:
       - kafka
       - elasticsearch
