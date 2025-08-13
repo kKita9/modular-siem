@@ -9,9 +9,9 @@ services:
     ports:
       - "2181:2181"
 
-  kafka:
+  message-broker:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: kafka
+    container_name: message-broker
     depends_on:
       - zookeeper
     ports:
@@ -19,12 +19,12 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://message-broker:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  elasticsearch:
+  data-storage:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
-    container_name: elasticsearch
+    container_name: data-storage
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -34,37 +34,36 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data
 
-  kibana:
+  visualization:
     image: docker.elastic.co/kibana/kibana:8.13.0
-    container_name: kibana
+    container_name: visualization
     ports:
       - "5601:5601"
     depends_on:
-      - elasticsearch
+      - data-storage
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://data-storage:9200
       - xpack.security.enabled=false
 
-  filebeat:
+  data-aggregator-agent:
     image: docker.elastic.co/beats/filebeat:8.13.0
-    container_name: filebeat
+    container_name: data-aggregator-agent
     user: root
     volumes:
       - ./data-aggregator/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /opt/threat-detection-lab/logs/suricata/ssh:/logs:ro
     command: ["--strict.perms=false"]
     depends_on:
-      - kafka
+      - message-broker
 
-  logstash:
+  raw-data-router:
     image: docker.elastic.co/logstash/logstash:8.13.0
-    container_name: logstash
+    container_name: raw-data-router
     volumes:
       - ./data-aggregator/pipeline:/usr/share/logstash/pipeline:ro
     depends_on:
-      - kafka
-      - elasticsearch
-
+      - message-broker
+      - data-storage
 
 volumes:
   esdata:
