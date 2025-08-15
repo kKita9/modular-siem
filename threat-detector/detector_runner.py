@@ -1,9 +1,16 @@
 import json
 import logging
+import sys
 from kafka import KafkaConsumer, KafkaProducer
 
 from detection_model import DetectionModel
 from alert_model import Alert 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+    stream=sys.stdout
+)
 
 # setup 
 detection_model = DetectionModel(model_path='xgb_sharedcols_v1.pkl', name='threat_detector')  
@@ -31,6 +38,7 @@ for msg in consumer:
         sample = msg.value    
 
         detection_result = detection_model.detect(sample)
+        logging.info(f'Results: {detection_result}')
 
         if detection_result and detection_result.get("label") != 0:
             logging.info(f"Detected threat with confidence {detection_result['confidence']}")
