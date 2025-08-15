@@ -16,10 +16,21 @@ def flatten_entry(entry):
     return flat
 
 def parse_suricata_log(entry):
-    if entry.get("event_type") != "flow":
+    raw = entry.get("message")
+    if not raw:
+        logging.warning("No 'message' field found in entry")
+        return None
+    
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as e:
+        logging.error(f"Failed to decode JSON from 'message': {e}")
+        return None
+
+    if parsed.get("event_type") != "flow":
         logging.info(f"Skipping non-flow event: {entry.get('event_type')}")
         return None
-    return flatten_entry(entry)
+    return flatten_entry(parsed)
 
 # Kafka setup
 logging.info("Starting Kafka consumer and producer")
@@ -39,9 +50,10 @@ producer = KafkaProducer(
 # Process messages
 logging.info("Starting message processing loop")
 for msg in consumer:
-    logging.info(f"Received message: {msg.value}")
+    logging.info(f"Received message, timestamp: {msg.value.get('@timestamp')}")
     parsed = parse_suricata_log(msg.value)
     if parsed:
-        logging.info(f"Parsed message: {parsed}")
+        logging.info(f"Parsed message!")
         producer.send('normalized-logs', parsed)
+        producer.flush()
         logging.info("Sent parsed message to 'normalized-logs' topic")

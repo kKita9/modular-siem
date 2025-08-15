@@ -25,6 +25,10 @@ services:
   data-storage:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
     container_name: data-storage
+    networks:
+      default:
+        aliases:
+          - elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -61,6 +65,8 @@ services:
     container_name: raw-data-router
     volumes:
       - ./data-aggregator/pipeline:/usr/share/logstash/pipeline:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=http://data-storage:9200
     depends_on:
       - message-broker
       - data-storage
@@ -72,6 +78,17 @@ services:
     depends_on:
       - message-broker
     restart: always
+
+  normalized-data-router:
+    image: docker.elastic.co/logstash/logstash:8.13.0
+    container_name: normalized-data-router
+    volumes:
+      - ./data-normalizer/pipeline:/usr/share/logstash/pipeline:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=http://data-storage:9200
+    depends_on:
+      - message-broker
+      - data-storage
 
 volumes:
   esdata:
