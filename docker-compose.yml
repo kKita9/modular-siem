@@ -110,5 +110,18 @@ services:
         condition: service_healthy
     restart: always
 
+  alerts-data-router:
+    image: docker.elastic.co/logstash/logstash:8.13.0
+    container_name: alerts-data-router
+    volumes:
+      - ./threat-detector/pipeline:/usr/share/logstash/pipeline:ro
+    environment:
+      ELASTICSEARCH_HOSTS: http://data-storage:9200
+    depends_on:
+      message-broker:
+        condition: service_healthy
+      data-storage:
+        condition: service_started
+
 volumes:
   esdata:
