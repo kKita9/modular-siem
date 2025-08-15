@@ -90,5 +90,13 @@ services:
       - message-broker
       - data-storage
 
+  threat-detector:
+    build: 
+      context: ./threat-detector
+    container_name: threat-detector
+    depends_on:
+      - message-broker
+    restart: always
+
 volumes:
   esdata:
