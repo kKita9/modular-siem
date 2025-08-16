@@ -97,5 +97,20 @@ services:
         condition: service_healthy
     restart: always
 
+  smtp-server:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"  
+      - "8025:8025"   
+
+  alert-manager:
+    build:
+      context: ./alert-manager
+    container_name: alert-manager
+    depends_on:
+      message-broker:
+        condition: service_healthy
+    restart: always
+
 volumes:
   esdata:
