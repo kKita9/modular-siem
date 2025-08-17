@@ -13,7 +13,7 @@ logging.basicConfig(
 KAFKA_TOPIC = "threat-detection-alerts"
 KAFKA_BOOTSTRAP_SERVERS = "message-broker:9092"
 EMAIL_FROM = "siem@example.com"
-EMAIL_TO = "999carol999@gmail.com"
+EMAIL_TO = "company@example.com"
 SMTP_SERVER = "smtp-server"
 SMTP_PORT = 1025
 
