@@ -3,6 +3,12 @@ filebeat.inputs:
     enabled: true
     paths:
       - '/logs/eve.json'
+    fields:
+      source_type: suricata
+      sensor_id: ssh-lab-1
+      env: lab
+      region: local 
+    fields_under_root: true
 
 output.kafka:
   hosts: ["message-broker:9092"]
