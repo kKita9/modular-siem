@@ -37,6 +37,11 @@ for msg in consumer:
         logging.info(f"Received message: {msg.value}")
         sample = msg.value    
 
+        if sample.get('event_type') != 'flow':
+            logging.info("Skipping non flow event")
+            consumer.commit()
+            continue
+
         detection_result = detection_model.detect(sample)
         logging.info(f'Results: {detection_result}')
 
